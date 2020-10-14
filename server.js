@@ -15,6 +15,7 @@ if (process.env.NODE_ENV !== 'production') {
 const app = express();
 
 // Use middlewares
+require('./passport.config');
 app.use(cookieParser());
 app.use(cors());
 app.use(passport.initialize());

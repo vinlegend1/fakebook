@@ -4,7 +4,7 @@ const passportConfig = require("../passport.config");
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 
-const signToken = userId => {
+const signToken = userID => {
     return jwt.sign({
         iss: "keyboard cat",
         sub: userID
@@ -40,6 +40,7 @@ router.post('/login', passport.authenticate('local', { session: false }), (req, 
         const { _id, username, role } = req.user;
         const token = signToken(_id);
         res.cookie('access_token', token, { httpOnly: true, sameSite: true });
+        console.log(token);
         res.status(200).json({
             isAuthenticated: true,
             user: {

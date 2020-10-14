@@ -11,16 +11,6 @@ const cookieFromExtractor = req => {
     return token;
 }
 
-passport.use(new LocalStrategy((username, password, done) => {
-    User.findOne({ username }, (err, user) => {
-        if (err) return done(err);
-
-        if (!user) return done(null, false);
-
-        user.comparePassword(password, done);
-    })
-}));
-
 passport.use(new JWTStrategy({
     jwtFromRequest: cookieFromExtractor,
     secretOrKey: "keyboard cat" // maybe wanna use environment variables here
@@ -35,3 +25,14 @@ passport.use(new JWTStrategy({
         }
     })
 }))
+
+passport.use(new LocalStrategy((username, password, done) => {
+    User.findOne({ username }, (err, user) => {
+        if (err) return done(err);
+
+        if (!user) return done(null, false);
+
+        user.comparePassword(password, done);
+    })
+}));
+
