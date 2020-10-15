@@ -14,7 +14,8 @@ const UserSchema = new Schema({
         type: String,
         required: true,
     },
-    posts: [{type: Schema.ObjectId, ref: 'Post'}]
+    posts: [{type: Schema.ObjectId, ref: 'Post'}],
+    friends: [{type: Schema.ObjectId, ref: 'Friend'}]
 });
 
 UserSchema.pre('save', function(next) {

@@ -73,5 +73,16 @@ router.get('/authenticated', passport.authenticate('jwt', { session: false }), (
     });
 });
 
+router.get('/all', passport.authenticate('jwt', { session: false }), (req, res) => {
+
+    User.find({}, (err, users) => {
+        const { username, posts, friends } = users;
+        res.status(200).json({
+            username,
+            posts,
+            friends
+        });
+    })
+})
 
 module.exports = router;

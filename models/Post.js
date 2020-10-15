@@ -10,6 +10,15 @@ const PostSchema = new Schema({
         type: String,
         required: true,
     },
+    likes: {
+        type: Number,
+        default: 0
+    },
+    comments: [{ body: String, date: Date }],
+    date: {
+        type: Date,
+        default: Date.now()
+    }
 });
 
 
