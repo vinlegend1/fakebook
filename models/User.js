@@ -15,6 +15,7 @@ const UserSchema = new Schema({
         required: true,
     },
     posts: [{type: Schema.ObjectId, ref: 'Post'}],
+    friendRequest: [{ type: Schema.ObjectId, ref: 'User' }],
     friends: [{type: Schema.ObjectId, ref: 'Friend'}]
 });
 

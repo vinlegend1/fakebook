@@ -39,24 +39,20 @@ router.post('/request', passport.authenticate('jwt', { session: false }), (req, 
     const { user } = req.body;
     const thisUser = req.user;
 
-    // const friend = new Friend({
-    //     username: user
-    // })
+    const friend = new User(user)
 
-    // if (!thisUser || !user) {
-    //    return res.status(400).json({ msgBody: "Bad request", msgErr: true });
-    // }
+    if (!thisUser || !user) {
+       return res.status(400).json({ msgBody: "Bad request", msgErr: true });
+    }
 
-    // User.findOneAndUpdate({ username: thisUser.username }, { $push: { friends: friend } }, { useFindAndModify: false }, (err, thisUser) => {
+    User.findOneAndUpdate({ username: user.username }, { $push: { friendRequests: thisUser } }, { useFindAndModify: false }, (err, user) => {
 
-    //     User.findByIdAndUpdate({ username: user.username }, { $push: { friends: thisUser } }, { useFindAndModify: false }, (err, user) => {
-    //         return res.json({
-    //             message: "Friend request accepted",
-    //             error: false
-    //         });
-    //     })
-
-    // })
+            return res.json({
+                message: "Friend request sent",
+                user,
+                error: false
+            });
+    })
 
 });
 
