@@ -5,13 +5,11 @@ const Schema = mongoose.Schema;
 
 const FriendSchema = new Schema({
     username: {
-        type: String,
+        type: Schema.ObjectId,
+        ref: 'User',
         required: true,
-        min: 3,
-        max: 15
     },
-    posts: [{type: Schema.ObjectId, ref: 'Post'}],
-    messages: [{types: Schema.ObjectId, ref: 'Message'}]
+    messages: [{type: Schema.ObjectId, ref: 'Message'}]
 });
 
 

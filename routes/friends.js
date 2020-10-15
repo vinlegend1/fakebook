@@ -3,63 +3,84 @@ const passport = require("passport");
 // const passportConfig = require("../passport.config");
 const router = require('express').Router();
 // const jwt = require('jsonwebtoken');
-const Post = require('../models/Post');
+// const Post = require('../models/Post');
+const Friend = require('../models/Friend');
 
-router.get('/all/friends', (req, res) => {
-    res.send('ok');
+router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
+    const { _id } = req.user;
+
+    User.findById(_id, (err, user) => {
+        if (err) return res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
+        if (!user) return res.status(400).json({ msgBody: "Bad request", msgErr: true });
+        return res.status(200).json(user.friends);
+    })
 });
 
-router.get('/:username', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const { username } = req.params;
-    const { id } = req.query;
+router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+    const { id } = req.params;
+    const user = req.user;
 
     if (!username) {
        return res.status(400).json({ msgBody: "Bad request", msgErr: true });
     }
 
-    if (id) {
-        Post.findOne({ _id: id }, (err, post) => {
-            if (err) {
-                return res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
-            }
-            return res.status(200).json(post);
+    User.find({ username: user.username }, (err, user) => {
+        if (err) {
+            return res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
+        }
+        return res.status(200).json({
+            friend: user.friends.filter(friend => friend === id)
         });
-    } else {
-        Post.find({ postedBy: username }, (err, post) => {
-            if (err) {
-                return res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
-            }
-            return res.status(200).json(post);
-        });
-    }
-});
-
-router.post('/new', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const { title, body } = req.body;
-    const user = req.user;
-    const { username } = user;
-    const post = new Post({
-        title,
-        body,
-        postedBy: username
     });
 
-    if (!user) {
+});
+
+router.post('/request', passport.authenticate('jwt', { session: false }), (req, res) => {
+    const { user } = req.body;
+    const thisUser = req.user;
+
+    // const friend = new Friend({
+    //     username: user
+    // })
+
+    // if (!thisUser || !user) {
+    //    return res.status(400).json({ msgBody: "Bad request", msgErr: true });
+    // }
+
+    // User.findOneAndUpdate({ username: thisUser.username }, { $push: { friends: friend } }, { useFindAndModify: false }, (err, thisUser) => {
+
+    //     User.findByIdAndUpdate({ username: user.username }, { $push: { friends: thisUser } }, { useFindAndModify: false }, (err, user) => {
+    //         return res.json({
+    //             message: "Friend request accepted",
+    //             error: false
+    //         });
+    //     })
+
+    // })
+
+});
+
+router.post('/request/accept', passport.authenticate('jwt', { session: false }), (req, res) => {
+    const { user } = req.body;
+    const thisUser = req.user;
+
+    const friend = new Friend({
+        username: user
+    })
+
+    if (!thisUser || !user) {
        return res.status(400).json({ msgBody: "Bad request", msgErr: true });
     }
 
-    User.findOneAndUpdate({ username }, { $push: { posts: post } }, { useFindAndModify: false }, (err, user) => {
-        post.save((err) => {
+    User.findOneAndUpdate({ username: thisUser.username }, { $push: { friends: friend } }, { useFindAndModify: false }, (err, thisUser) => {
 
-            if (err) return res.status(500).json({ msgBody: "Error has occured", msgErr: true })
-            else {
-                return res.status(200).json({
-                    post,
-                    friends: user.friends
-                })
-            }
-            
+        User.findByIdAndUpdate({ username: user.username }, { $push: { friends: thisUser } }, { useFindAndModify: false }, (err, user) => {
+            return res.json({
+                message: "Friend request accepted",
+                error: false
+            });
         })
+
     })
 
 });

@@ -7,7 +7,7 @@ const Post = require('../models/Post');
 const Friend = require('../models/Friend');
 
 router.get('/all/friends', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const user = require('user');
+    const user = req.user;
     let allFriendsPosts = [];
     for (let i = 0; i < user.friends.length; i++) {
         Friend.findById(user.friends[i], (err, friend) => {
