@@ -31,5 +31,6 @@ connection.once('open', () => {
 });
 
 app.use('/api/user', require('./routes/user'));
+app.use('/api/post', require('./routes/post'));
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

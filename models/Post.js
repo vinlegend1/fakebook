@@ -10,11 +10,16 @@ const PostSchema = new Schema({
         type: String,
         required: true,
     },
+    postedBy: {type: String, required: true},
     likes: {
         type: Number,
         default: 0
     },
     comments: [{ body: String, date: Date }],
+    shares: {
+        type: Number,
+        default: 0
+    },
     date: {
         type: Date,
         default: Date.now()

@@ -13,14 +13,16 @@ const cookieFromExtractor = req => {
 
 passport.use(new JWTStrategy({
     jwtFromRequest: cookieFromExtractor,
+    passReqToCallback: true,
     secretOrKey: "keyboard cat" // maybe wanna use environment variables here
-}, (payload, done) => {
+}, (req, payload, done) => {
     User.findById({ _id: payload.sub }, (err, user) => {
         if (err) return done(err);
 
         if (!user) {
             return done(null,false);
         } else {
+            req.user = user;
             return done(null, user);
         }
     })

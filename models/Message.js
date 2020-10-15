@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-// const bcrypt = require('bcrypt');
-// const Post = require('./Post');
 
 const MessageSchema = new Schema({
     from: {type: Schema.ObjectId, ref: 'User'},
