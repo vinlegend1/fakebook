@@ -4,13 +4,13 @@ const passport = require("passport");
 const router = require('express').Router();
 // const jwt = require('jsonwebtoken');
 const Post = require('../models/Post');
-const Friend = require('../models/Friend');
+// const Friend = require('../models/Friend');
 
 router.get('/all/friends', passport.authenticate('jwt', { session: false }), (req, res) => {
     const user = req.user;
     let allFriendsPosts = [];
     for (let i = 0; i < user.friends.length; i++) {
-        Friend.findById(user.friends[i], (err, friend) => {
+        User.findById(user.friends[i], (err, friend) => {
             if (err) res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
             allFriendsPosts.push(friend.posts);
         });
