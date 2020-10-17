@@ -44,7 +44,7 @@ router.post('/login', passport.authenticate('local', { session: false }), (req, 
     if (req.isAuthenticated()) {
         const { _id, username } = req.user;
         const token = signToken(_id);
-        res.cookie('access_token', token, { httpOnly: true, sameSite: "none" });
+        res.cookie('access_token', token, { httpOnly: true, sameSite: true });
         console.log(token);
         res.status(200).json({
             isAuthenticated: true,
@@ -60,20 +60,18 @@ router.get('/logout', passport.authenticate('jwt', { session: false }), (req, re
     // console.log('clear')
     return res.json({
         user: {
-            username: "",
-            role: ""
+            username: ""
         },
         success: true
     })
 });
 
 router.get('/authenticated', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const { username, role } = req.user;
+    const { username } = req.user;
     res.status(200).json({
         isAuthenticated: true,
         user: {
-            username,
-            role
+            username
         }
     });
 });
