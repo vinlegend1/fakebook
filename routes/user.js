@@ -1,8 +1,8 @@
 const User = require('../models/User');
 const passport = require("passport");
-// const passportConfig = require("../passport.config");
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
+// require('../passport.config')
 
 const signToken = userID => {
     return jwt.sign({
@@ -13,6 +13,11 @@ const signToken = userID => {
 
 router.post('/register', (req, res) => {
     const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ msgBody: "Go fuck yourself, mate", msgErr: true });
+    }
+
     User.findOne({ username }, (err, user) => {
         if (err) {
             return res.status(500).json({ msgBody: "Error has occured", msgErr: true });
@@ -37,9 +42,9 @@ router.post('/register', (req, res) => {
 
 router.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
     if (req.isAuthenticated()) {
-        const { _id, username, role } = req.user;
+        const { _id, username } = req.user;
         const token = signToken(_id);
-        res.cookie('access_token', token, { httpOnly: true, sameSite: true });
+        res.cookie('access_token', token, { httpOnly: true, sameSite: "none" });
         console.log(token);
         res.status(200).json({
             isAuthenticated: true,
@@ -76,12 +81,16 @@ router.get('/authenticated', passport.authenticate('jwt', { session: false }), (
 router.get('/all', passport.authenticate('jwt', { session: false }), (req, res) => {
 
     User.find({}, (err, users) => {
-        const { username, posts, friends } = users;
-        res.status(200).json({
-            username,
-            posts,
-            friends
-        });
+        let userObj = [];
+        for (let i = 0; i < users.length; i++) {
+            userObj.push({
+                username: users[i].username,
+                posts: users[i].posts,
+                friends: users[i].friends
+            })
+        }
+        console.log(users);
+        res.status(200).json(userObj);
     })
 })
 

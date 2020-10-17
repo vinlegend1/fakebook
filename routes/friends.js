@@ -1,10 +1,7 @@
 const User = require('../models/User');
 const passport = require("passport");
-// const passportConfig = require("../passport.config");
 const router = require('express').Router();
-// const jwt = require('jsonwebtoken');
-// const Post = require('../models/Post');
-const Friend = require('../models/Friend');
+// const Friend = require('../models/Friend');
 
 router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
     const { _id } = req.user;
@@ -45,12 +42,12 @@ router.post('/request', passport.authenticate('jwt', { session: false }), (req, 
        return res.status(400).json({ msgBody: "Bad request", msgErr: true });
     }
 
-    User.findOneAndUpdate({ username: user.username }, { $push: { friendRequests: thisUser } }, { useFindAndModify: false }, (err, user) => {
+    User.findOneAndUpdate({ username: user.username }, { $addToSet: { friendRequest: thisUser } }, { useFindAndModify: false }, (err, user) => {
 
             return res.json({
-                message: "Friend request sent",
+                msgBody: "Friend request sent",
                 user,
-                error: false
+                msgErr: false
             });
     })
 
@@ -60,7 +57,7 @@ router.post('/request/accept', passport.authenticate('jwt', { session: false }),
     const { user } = req.body;
     const thisUser = req.user;
 
-    const friend = new Friend({
+    const friend = new User({
         username: user
     })
 
@@ -72,8 +69,8 @@ router.post('/request/accept', passport.authenticate('jwt', { session: false }),
 
         User.findByIdAndUpdate({ username: user.username }, { $push: { friends: thisUser } }, { useFindAndModify: false }, (err, user) => {
             return res.json({
-                message: "Friend request accepted",
-                error: false
+                msgBody: "Friend request accepted",
+                msgErr: false
             });
         })
 

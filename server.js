@@ -32,7 +32,7 @@ connection.once('open', () => {
 
 app.use('/api/user', require('./routes/user'));
 app.use('/api/post', require('./routes/post'));
-// app.use('/api/message', require('./routes/message'));
+app.use('/api/message', require('./routes/message'));
 app.use('/api/friends', require('./routes/friends'));
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
