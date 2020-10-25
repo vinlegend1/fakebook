@@ -2,18 +2,33 @@ const User = require('../models/User');
 const passport = require("passport");
 const router = require('express').Router();
 const Post = require('../models/Post');
+const mongoose = require('mongoose');
 
+// SOmething wrong here too...
 router.get('/all/friends', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const user = req.user;
+    const { _id } = req.user;
+    // console.log("id: " + _id);
     let allFriendsPosts = [];
-    for (let i = 0; i < user.friends.length; i++) {
-        User.findById(user.friends[i], (err, friend) => {
-            if (err) res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
-            allFriendsPosts.push(friend.posts);
-        });
-    }
-
-    res.json(allFriendsPosts);
+    User.find({'friends': { $in: [mongoose.Types.ObjectId(_id)] }}, async (err, friends) => {
+        // console.log(friends);
+        if (err) res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
+        for (let i = 0; i < friends.length; i++) {
+            await Post.find({ postedBy: friends[i].username }, (err, posts) => {
+                // console.log(posts)
+                if (err) {
+                    return res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
+                }
+                allFriendsPosts.push({
+                    posts: posts,
+                    username: friends[i].username,
+                    _id: friends[i]._id
+                })
+            });
+            
+        }
+        console.log(allFriendsPosts)
+        return res.status(200).json(allFriendsPosts)
+    });
 });
 
 router.get('/:username', passport.authenticate('jwt', { session: false }), (req, res) => {
@@ -61,8 +76,8 @@ router.post('/new', passport.authenticate('jwt', { session: false }), (req, res)
             if (err) return res.status(500).json({ msgBody: "Error has occured", msgErr: true })
             else {
                 return res.status(200).json({
-                    post,
-                    friends: user.friends
+                    msgBody: "Posted just now",
+                    msgErr: false
                 })
             }
             

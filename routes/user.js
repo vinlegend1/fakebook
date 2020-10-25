@@ -87,8 +87,21 @@ router.get('/all', passport.authenticate('jwt', { session: false }), (req, res) 
                 friends: users[i].friends
             })
         }
-        console.log(users);
+        // console.log(users);
         res.status(200).json(userObj);
+    })
+})
+
+router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+    const { id } = req.params;
+
+    User.findById(id, (err, user) => {
+        if (err) return res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
+        if (!user) return res.status(400).json({ msgBody: "Bad request", msgErr: true });
+        return res.status(200).json({
+            username: user.username,
+            id: user._id
+        });
     })
 })
 

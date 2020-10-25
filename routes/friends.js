@@ -1,35 +1,30 @@
 const User = require('../models/User');
 const passport = require("passport");
 const router = require('express').Router();
+const mongoose = require('mongoose');
 // const Friend = require('../models/Friend');
 
 router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
     const { _id } = req.user;
 
-    User.findById(_id, (err, user) => {
-        if (err) return res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
-        if (!user) return res.status(400).json({ msgBody: "Bad request", msgErr: true });
-        return res.status(200).json(user.friends);
-    })
-});
-
-router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const { id } = req.params;
-    const user = req.user;
-
-    if (!username) {
-       return res.status(400).json({ msgBody: "Bad request", msgErr: true });
-    }
-
-    User.find({ username: user.username }, (err, user) => {
-        if (err) {
-            return res.status(500).json({ msgBody: "Something went wrong", msgErr: true });
-        }
-        return res.status(200).json({
-            friend: user.friends.filter(friend => friend === id)
-        });
+    User.find({
+        'friends': { $in: [mongoose.Types.ObjectId(_id)] }
+    }, (err, friends) => {
+            // console.log(friends);
+            let arrOfFriends = [];
+            for (let i = 0; i < friends.length; i++) {
+                arrOfFriends.push({
+                    posts: friends[i].posts,
+                    friends: friends[i].friends,
+                    messages: friends[i].messages,
+                    username: friends[i].username,
+                    _id: friends[i]._id
+                })
+            }
+            return res.status(200).json(arrOfFriends)
     });
 
+    // console.log(req.user._id);
 });
 
 router.post('/request', passport.authenticate('jwt', { session: false }), (req, res) => {
@@ -40,6 +35,10 @@ router.post('/request', passport.authenticate('jwt', { session: false }), (req, 
 
     if (!thisUser || !user) {
        return res.status(400).json({ msgBody: "Bad request", msgErr: true });
+    }
+
+    if (user.username == thisUser.username) {
+        return res.status(400).json({ msgBody: "You can't friend yourself, loner!", msgErr: true });
     }
 
     User.findOneAndUpdate({ username: user.username }, { $addToSet: { friendRequest: thisUser } }, { useFindAndModify: false }, (err, user) => {
@@ -54,20 +53,17 @@ router.post('/request', passport.authenticate('jwt', { session: false }), (req, 
 });
 
 router.post('/request/accept', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const { user } = req.body;
+    const { id } = req.body;
     const thisUser = req.user;
 
-    const friend = new User({
-        username: user
-    })
-
-    if (!thisUser || !user) {
+    if (!thisUser || !id) {
        return res.status(400).json({ msgBody: "Bad request", msgErr: true });
     }
 
-    User.findOneAndUpdate({ username: thisUser.username }, { $push: { friends: friend } }, { useFindAndModify: false }, (err, thisUser) => {
+    User.findByIdAndUpdate(thisUser._id, { $addToSet: { friends: mongoose.Types.ObjectId(id) }, $pull: { friendRequest: mongoose.Types.ObjectId(id) } }, { useFindAndModify: false }, (err, thisUser) => {
 
-        User.findByIdAndUpdate({ username: user.username }, { $push: { friends: thisUser } }, { useFindAndModify: false }, (err, user) => {
+        User.findByIdAndUpdate(id, { $addToSet: { friends: thisUser } }, { useFindAndModify: false }, (err, user) => {
+            console.log(user);
             return res.json({
                 msgBody: "Friend request accepted",
                 msgErr: false
@@ -77,5 +73,22 @@ router.post('/request/accept', passport.authenticate('jwt', { session: false }),
     })
 
 });
+
+// router.get('/find/:username', passport.authenticate('jwt', { session: false }), (req, res) => {
+    
+//     res.send('ok');
+//     const { username } = req.params;
+//     const user = req.user;
+
+//     if (!user.username) {
+//        return res.status(400).json({ msgBody: "Bad request", msgErr: true });
+//     }
+
+//     User.find({ username: user.username, 'friends': { $in: [username] } }, (err, user) => {
+//         console.log(user);
+//         res.send('ok')
+//     });
+
+// });
 
 module.exports = router;

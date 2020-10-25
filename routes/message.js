@@ -48,6 +48,7 @@ router.post('/new/:username', passport.authenticate('jwt', { session: false }), 
     
 });
 
+// Have to fix this route... so don't use it at the moment
 router.delete('/:username/:messageId', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { username, messageId } = req.params;
     const user = req.user;
