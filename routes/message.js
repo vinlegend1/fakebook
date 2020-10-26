@@ -6,6 +6,10 @@ const Message = require('../models/Message');
 router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
     const user = req.user;
 
+    // Message.find({ from: user._id to: user._id }, (err, messages) => {
+    //     return 
+    // })
+
     User.findById(user._id, (err, user) => {
         return res.status(200).json(user.messages);
     })

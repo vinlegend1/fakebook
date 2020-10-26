@@ -83,6 +83,7 @@ router.get('/all', passport.authenticate('jwt', { session: false }), (req, res) 
         for (let i = 0; i < users.length; i++) {
             userObj.push({
                 username: users[i].username,
+                id: users[i]._id,
                 posts: users[i].posts,
                 friends: users[i].friends
             })

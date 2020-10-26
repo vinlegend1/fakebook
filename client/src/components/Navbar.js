@@ -41,6 +41,10 @@ const Navbar = props => {
             </li>
 
             <li className="nav-item">
+                <Link to="/home/lonerspace"><a className="nav-link">Find a Friend</a></Link>
+            </li>
+
+            <li className="nav-item">
                 <button className="btn btn-outline-secondary nav-link" onClick={onClickLogout} >Logout</button>
             </li>
             

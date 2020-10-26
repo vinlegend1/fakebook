@@ -27,33 +27,32 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
     // console.log(req.user._id);
 });
 
-router.post('/request', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const { user } = req.body;
+router.put('/request', passport.authenticate('jwt', { session: false }), (req, res) => {
+    const { id } = req.query;
     const thisUser = req.user;
 
-    const friend = new User(user)
+    // const friend = new User(user)
 
-    if (!thisUser || !user) {
+    if (!thisUser) {
        return res.status(400).json({ msgBody: "Bad request", msgErr: true });
     }
 
-    if (user.username == thisUser.username) {
+    if (id == thisUser._id) {
         return res.status(400).json({ msgBody: "You can't friend yourself, loner!", msgErr: true });
     }
 
-    User.findOneAndUpdate({ username: user.username }, { $addToSet: { friendRequest: thisUser } }, { useFindAndModify: false }, (err, user) => {
+    User.findOneAndUpdate({ _id: id }, { $addToSet: { friendRequest: thisUser } }, { useFindAndModify: false }, (err, user) => {
 
             return res.json({
                 msgBody: "Friend request sent",
-                user,
                 msgErr: false
             });
     })
 
 });
 
-router.post('/request/accept', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const { id } = req.body;
+router.put('/request/accept', passport.authenticate('jwt', { session: false }), (req, res) => {
+    const { id } = req.query;
     const thisUser = req.user;
 
     if (!thisUser || !id) {

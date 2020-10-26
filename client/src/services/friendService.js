@@ -5,22 +5,17 @@ export default {
     getFriendById: id => {
         return fetch(`/api/friends/${id}`).then(res => res.json()).then(data => data);
     },
-    sendFriendRequest: userToSend => {
-        return fetch('//api/friends/request', {
-            method: 'POST',
-            body: JSON.stringify(userToSend),
-            headers: {
-                'Content-Type': 'application/json'
-            }
+    sendFriendRequest: id => {
+        return fetch(`/api/friends/request?id=${id}`, {
+            method: 'PUT'
         }).then(res => res.json()).then(data => data);
     },
-    acceptFriendRequest: userToAccept => {
-        return fetch('//api/friends/request/accept', {
-            method: 'POST',
-            body: JSON.stringify(userToAccept),
-            headers: {
-                'Content-Type': 'application/json'
-            }
+    acceptFriendRequest: id => {
+        return fetch(`/api/friends/request/accept?id=${id}`, {
+            method: 'PUT'
         }).then(res => res.json()).then(data => data);
+    },
+    getAllUsers: () => {
+        return fetch('/api/user/all').then(res => res.json()).then(data => data);
     }
 }
