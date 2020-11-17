@@ -37,7 +37,7 @@ router.post('/register', (req, res) => {
             })
         }
     })
-    
+
 });
 
 router.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
@@ -78,19 +78,12 @@ router.get('/authenticated', passport.authenticate('jwt', { session: false }), (
 
 router.get('/all', passport.authenticate('jwt', { session: false }), (req, res) => {
 
-    User.find({}, (err, users) => {
-        let userObj = [];
-        for (let i = 0; i < users.length; i++) {
-            userObj.push({
-                username: users[i].username,
-                id: users[i]._id,
-                posts: users[i].posts,
-                friends: users[i].friends
-            })
-        }
-        // console.log(users);
-        res.status(200).json(userObj);
-    })
+    User.find({})
+        .populate('posts')
+        .populate('friends')
+        .exec((err, user) => {
+            return res.json(user);
+        })
 })
 
 router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) => {

@@ -10,12 +10,12 @@ const PostSchema = new Schema({
         type: String,
         required: true,
     },
-    postedBy: {type: String, required: true},
+    postedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     likes: {
         type: Number,
         default: 0
     },
-    comments: [{ body: String, date: Date }],
+    comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     shares: {
         type: Number,
         default: 0
@@ -25,20 +25,5 @@ const PostSchema = new Schema({
         default: Date.now()
     }
 });
-
-
-// UserSchema.methods.comparePassword = function(password, cb) {
-//     bcrypt.compare(password, this.password, (err, isMatch) => {
-//         if (err) {
-//             return cb(err);
-//         } else {
-//             if (!isMatch) {
-//                 return cb(null, isMatch);
-//             }
-//             return cb(null, this);
-//         }
-
-//     })
-// }
 
 module.exports = mongoose.model('Post', PostSchema);
