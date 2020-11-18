@@ -20,7 +20,7 @@ passport.use(new JWTStrategy({
         if (err) return done(err);
 
         if (!user) {
-            return done(null,false);
+            return done(null, false);
         } else {
             req.user = user;
             return done(null, user);
@@ -29,7 +29,7 @@ passport.use(new JWTStrategy({
 }))
 
 passport.use(new LocalStrategy((username, password, done) => {
-    User.findOne({ username }, (err, user) => {
+    User.findOne({ username }).select('+password').exec((err, user) => {
         if (err) return done(err);
 
         if (!user) return done(null, false);

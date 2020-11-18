@@ -13,14 +13,15 @@ const UserSchema = new Schema({
     password: {
         type: String,
         required: true,
+        select: false
     },
-    posts: [{type: Schema.ObjectId, ref: 'Post'}],
+    posts: [{ type: Schema.ObjectId, ref: 'Post' }],
     friendRequest: [{ type: Schema.ObjectId, ref: 'User' }],
-    friends: [{type: Schema.ObjectId, ref: 'User'}],
-    messages: [{type: Schema.ObjectId, ref: 'Message'}]
+    friends: [{ type: Schema.ObjectId, ref: 'User' }],
+    messages: [{ type: Schema.ObjectId, ref: 'Message' }]
 });
 
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function (next) {
     if (!this.isModified('password')) {
         return next();
     }
@@ -32,7 +33,7 @@ UserSchema.pre('save', function(next) {
 });
 
 
-UserSchema.methods.comparePassword = function(password, cb) {
+UserSchema.methods.comparePassword = function (password, cb) {
     bcrypt.compare(password, this.password, (err, isMatch) => {
         if (err) {
             return cb(err);
